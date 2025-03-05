@@ -1,0 +1,552 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Évaluation de Prix de Voitures</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.2/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css" rel="stylesheet">
+    <link href="assets/css/formulaire.css" rel="stylesheet">
+    <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.8.2/angular.min.js"></script>
+    <script src="assets/js/app.js"></script>
+    
+</head>
+<body ng-app="myApp" >
+    <div class="container-fluid">
+        <div class="row">
+            <!-- Sidebar -->
+            <div class="col-md-3 col-lg-2 sidebar px-0">
+                <div class="logo-placeholder">
+                    <img src="assets/img/logo.jpg" alt="Logo" class="img-fluid">
+                </div>
+                <nav class="nav flex-column">
+                    <a class="nav-link" href="#"><i class="fas fa-home me-2"></i>Index</a>
+                    <a class="nav-link active" href="#"><i class="fas fa-file-alt me-2"></i>Formulaire</a>
+                    <a class="nav-link" href="#"><i class="fas fa-cog me-2"></i>Paramètres</a>
+                </nav>
+            </div>
+
+            <!-- Main Content -->
+            <div class="col-md-9 col-lg-10 main-content" ng-controller="FormController">
+                <div class="card shadow">
+                    <div class="card-body">
+                        <h1 class="text-center mb-4">Évaluation de Prix de Voitures</h1>
+                        <form id="carEvaluationForm">
+                        
+                        <div ng-if="!showSummary">
+                            <!-- Informations Générales -->
+                            <div class="card mb-4">
+                                <div ng-show="currentStep === 1">
+                                    <div class="card-header">
+                                        <h5 class="mb-0">Informations Générales</h5>
+                                    </div>
+                                    <div class="card-body">
+                                        <div class="form-group">
+                                            <label for="partnerName" class="form-label">Nom du partenaire</label>
+                                            <input type="text" class="form-control" id="partnerName" ng-model="formData.partnerName" required>
+                                        </div>
+                                        <div class="form-group">
+                                            <label for="zone" class="form-label">Zone</label>
+                                            <select class="form-select" id="zone" ng-model="formData.zone" required>
+                                                <option value="nord">Nord</option>
+                                                <option value="sud">Sud</option>
+                                                <option value="est">Est</option>
+                                                <option value="ouest">Ouest</option>
+                                                <option value="centre">Centre</option>
+                                            </select>
+                                        </div>
+                                        <div class="form-group">
+                                            <label for="ownerName" class="form-label">Nom du propriétaire</label>
+                                            <input type="text" class="form-control" id="ownerName" ng-model="formData.ownerName" required>
+                                        </div>
+                                    </div>
+                                </div>   
+                            </div>
+
+                            <!-- Caractéristiques du Véhicule -->
+                            <div class="card mb-4" ng-controller="KilometrageController">
+                                <div ng-show="currentStep === 2">
+                                    <div class="card-header">
+                                        <h5 class="mb-0">Caractéristiques du Véhicule</h5>
+                                    </div>
+                                    <div class="card-body">
+                                        <div class="form-group">
+                                            <label for="brand" class="form-label">Marque</label>
+                                            <input type="text" class="form-control" id="brand" ng-model="formData.brand" required>
+                                        </div>
+                                        <div class="form-group">
+                                            <label for="model" class="form-label">Modèle</label>
+                                            <input type="text" class="form-control" id="model" ng-model="formData.model" required>
+                                        </div>
+                                        <div class="form-group">
+                                            <label for="registration" class="form-label">Immatriculation</label>
+                                            <input type="text" class="form-control" id="registration" ng-model="formData.registration" required>
+                                        </div>
+                                        <div class="form-group">
+                                            <label for="fuelType" class="form-label">Type de carburant</label>
+                                            <select class="form-select" id="fuelType" ng-model="formData.fuelType" required>
+                                                <option value="essence">Essence</option>
+                                                <option value="gasoil">Gasoil</option>
+                                            </select>
+                                        </div>
+
+                                        <div class="form-group">
+                                            <label for="firstRegistrationDate" class="form-label">Date de première mise en circulation</label>
+                                            <input type="date" class="form-control" id="firstRegistrationDate" ng-model="formData.firstRegistrationDate" ng-change="calculateAverageMileage()" required>
+                                        </div>
+                                        
+                                        <div class="form-group">
+                                            <label for="vehicleCategory" class="form-label">Catégorie du véhicule</label>
+                                            <select class="form-select" id="vehicleCategory" ng-model="formData.vehicleCategory" required>
+                                                <option value="camionnette">Camionnette</option>
+                                                <option value="fourgon">Fourgon</option>
+                                                <option value="coupe">Coupé</option>
+                                                <option value="break">Break</option>
+                                                <option value="berline">Berline</option>
+                                                <option value="suv">SUV</option>
+                                                <option value="camion">Camion</option>
+                                            </select>
+                                        </div>
+                                        
+                                        <div class="form-group">
+                                            <label for="vehicleUsage" class="form-label">Usage du véhicule</label>
+                                            <select class="form-select" id="vehicleUsage" ng-model="formData.vehicleUsage" required>
+                                                <option value="personnel">Usage personnel </option>
+                                                <option value="professionnel">Usage professionnel </option>
+                                            </select>
+                                        </div>
+                                        
+                                        <!-- Sous-options pour Usage Personnel -->
+                                        <div class="form-group" ng-show="formData.vehicleUsage == 'personnel'">
+                                            <label for="personnelType" class="form-label">Type d'usage personnel</label>
+                                            <select class="form-select" id="usageType" ng-model="formData.usageType" ng-change="calculateAverageMileage()">
+                                                <option value="prive">Privé</option>
+                                                <option value="particulier">Particulier</option>
+                                            </select>
+                                        </div>
+                                        
+                                        <!-- Sous-options pour Usage Professionnel -->
+                                        <div class="form-group" ng-show="formData.vehicleUsage == 'professionnel'">
+                                            <label for="professionnelType" class="form-label">Type d'usage professionnel</label>
+                                            <select class="form-select" id="usageType" ng-model="formData.usageType" ng-change="calculateAverageMileage()">
+                                                <option value="marchandises">Transport de marchandises</option>
+                                                <option value="personnes">Transport de personnes</option>
+                                            </select>
+                                        </div>
+                                        
+                                        <!-- Kilométrage réel -->
+                                        <div class="form-group">
+                                            <label for="mileage" class="form-label">Kilométrage réel (km)</label>
+                                            <input type="number" class="form-control" id="mileage" ng-model="formData.realMileage" ng-change="calculateAverageMileage()" required>
+                                        </div>
+                                        
+                                        <!-- Kilométrage moyen standard -->
+                                        <div class="form-group">
+                                            <label for="averageMileage" class="form-label">Kilométrage moyen standard</label>
+                                            <input type="number" class="form-control" id="averageMileage" ng-model="formData.averageMileage" readonly>
+                                        </div>
+                                        
+                                        <!-- Kilométrage moyen annuel -->
+                                        <div class="form-group">
+                                            <label for="averageYearlyMileage" class="form-label">Kilométrage moyen annuel</label>
+                                            <input type="number" class="form-control" id="averageYearlyMileage" ng-model="formData.averageYearlyMileage" readonly>
+                                        </div>
+                                        
+                                        <!-- Âge du véhicule -->
+                                        <div class="form-group">
+                                            <label for="vehicleAge" class="form-label">Âge du véhicule</label>
+                                            <input type="number" class="form-control" id="vehicleAge" ng-model="formData.vehicleAge" readonly>
+                                        </div>
+                                        
+                                        <div class="form-group">
+                                            <label for="purchaseDate" class="form-label">Date d'achat</label>
+                                            <input type="date" class="form-control" id="purchaseDate"  ng-model="formData.purchaseDate" required>
+                                        </div>
+                                        <div class="form-group">
+                                            <label for="condition" class="form-label">Voiture neuve ou d'occasion</label>
+                                            <select class="form-select" id="condition"  ng-model="formData.condition" required>
+                                                <option value="neuve">Neuve</option>
+                                                <option value="occasion">Occasion</option>
+                                            </select>
+                                        </div>
+                                        <div class="form-group">
+                                            <label for="purchasePrice" class="form-label">Prix d'achat TTC (Ar)</label>
+                                            <input type="number" class="form-control" id="purchasePrice"  ng-model="formData.purchasePrice" required>
+                                        </div>
+                                    
+                                        
+                                        
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Évaluation de l'état du Véhicule -->
+                            <div class="card mb-4">
+                                <div ng-show="currentStep === 3">
+                                    <div class="card-header">
+                                        <h5 class="mb-0">Évaluation de l'état du Véhicule</h5>
+                                    </div>
+                                    <div class="card-body" ng-controller="evaluationController">
+                                        <div class="form-group">
+                                            <label for="bodyRating" class="form-label">Carrosserie (0-10)</label>
+                                            <input type="number" class="form-control" id="bodyRating" ng-model="formData.bodyRating" min="0" max="10" required>
+                                        </div>
+                                        <div class="form-group">
+                                            <label for="interiorRating" class="form-label">Intérieur (0-10)</label>
+                                            <input type="number" class="form-control" id="interiorRating" ng-model="formData.interiorRating" min="0" max="10" required>
+                                        </div>
+                                        <div class="form-group">
+                                            <label for="engineRating" class="form-label">Moteur (0-10)</label>
+                                            <input type="number" class="form-control" id="engineRating" ng-model="formData.engineRating" min="0" max="10" required>
+                                        </div>
+                                        <div class="form-group">
+                                            <label for="averageRating" class="form-label">Moyenne</label>
+                                            <div class="input-group">
+                                                <span class="input-group-text" id="averageRating" ng-model="formData.averageRating">{{ formData.averageRating }}</span>
+                                                <span class="input-group-text" id="ratingResult" ng-model="formData.ratingResult">{{ formData.ratingResult }}</span>
+                                            </div>
+                                        </div>
+                                        <div class="form-group mt-4">
+                                            <label for="evaluator1Price" class="form-label">Prix Évaluateur 1 (Ar)</label>
+                                            <input type="number" class="form-control" id="evaluator1Price" ng-model="formData.evaluator1Price" required>
+                                        </div>
+                                        <div class="form-group">
+                                            <label for="evaluator2Price" class="form-label">Prix Évaluateur 2 (Ar)</label>
+                                            <input type="number" class="form-control" id="evaluator2Price" ng-model="formData.evaluator2Price" required>
+                                        </div>
+                                        <div class="form-group">
+                                            <label for="marketPrice" class="form-label">Prix du Marché Local (Ar)</label>
+                                            <input type="number" class="form-control" id="marketPrice" ng-model="formData.marketPrice" required>
+                                        </div>
+                                        <div class="form-group mt-4">
+                                            <label for="ownerPrice" class="form-label">Prix Propriétaire (Ar)</label>
+                                            <input type="number" class="form-control" id="ownerPrice" ng-model="formData.ownerPrice" required>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="form-navigation">
+                                <button class="btn btn-primary" ng-click="previousStep()" ng-show="currentStep > 1">Précédent</button>
+                                <button class="btn btn-primary" ng-click="nextStep()" ng-show="currentStep < 3">Suivant</button>
+                                <button class="btn btn-primary" ng-click="submitForm()" ng-show="currentStep === 3">Soumettre l'évaluation</button>
+                            </div>
+                        </div>
+
+                            <!-- Resume -->
+                            <div class="card mb-4" ng-show="showSummary">
+                                <div class="card-header bg-primary text-white">
+                                    <h5 class="mb-0">Résumé de l'Évaluation</h5>
+                                </div>
+                                <div class="card-body" id="resume">
+                                    <!-- Informations Générales -->
+                                    <div class="card mb-4 shadow-sm">
+                                        <div class="card-header bg-light p-1">
+                                            <h5 class="fw-bold mb-0" style="font-size: 1rem;">Informations Générales</h5>
+                                        </div>
+                                        <div class="card-body p-2">
+                                            <div class="row align-items-center">
+                                                <div class="col-md-4">
+                                                    <dl class="row mb-0">
+                                                        <dt class="col-sm-6 p-0">Nom du partenaire:</dt>
+                                                        <dd class="col-sm-6 p-0">{{formData.partnerName}}</dd>
+                                                    </dl>
+                                                </div>
+                                                <div class="col-md-4">
+                                                    <dl class="row mb-0">
+                                                        <dt class="col-sm-6 p-0">Zone:</dt>
+                                                        <dd class="col-sm-6 p-0">{{formData.zone | uppercase}}</dd>
+                                                    </dl>
+                                                </div>
+                                                <div class="col-md-4">
+                                                    <dl class="row mb-0">
+                                                        <dt class="col-sm-5 p-0">Propriétaire:</dt>
+                                                        <dd class="col-sm-7 p-0">{{formData.ownerName}}</dd>
+                                                    </dl>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    
+                                    
+
+                                    <!-- Caractéristiques du Véhicule -->
+                                    <div class="card mb-4 shadow-sm">
+                                        <div class="card-header bg-light">
+                                            <h5 class="fw-bold mb-0">Caractéristiques du Véhicule</h5>
+                                        </div>
+                                        <div class="card-body">
+                                            <div class="row">
+                                                <div class="col-md-4">
+                                                    <table class="table table-sm">
+                                                        <tr>
+                                                            <th>Marque</th>
+                                                            <td>{{formData.brand}}</td>
+                                                        </tr>
+                                                        <tr>
+                                                            <th>Modèle</th>
+                                                            <td>{{formData.model}}</td>
+                                                        </tr>
+                                                        <tr>
+                                                            <th>Immatriculation</th>
+                                                            <td class="font-monospace">{{formData.registration}}</td>
+                                                        </tr>
+                                                    </table>
+                                                </div>
+                                                
+                                                <div class="col-md-4">
+                                                    <table class="table table-sm">
+                                                        <tr>
+                                                            <th>Carburant</th>
+                                                            <td>{{formData.fuelType}}</td>
+                                                        </tr>
+                                                        <tr>
+                                                            <th>Catégorie</th>
+                                                            <td>{{formData.vehicleCategory}}</td>
+                                                        </tr>
+                                                        <tr>
+                                                            <th>Mise en circulation</th>
+                                                            <td>{{formData.firstRegistrationDate | date:'dd/MM/yyyy'}}</td>
+                                                        </tr>
+                                                    </table>
+                                                </div>
+                                                
+                                                <div class="col-md-4">
+                                                    <table class="table table-sm">
+                                                        <tr>
+                                                            <th>Âge</th>
+                                                            <td>{{formData.vehicleAge}} ans</td>
+                                                        </tr>
+                                                        <tr>
+                                                            <th>Kilométrage</th>
+                                                            <td>{{formData.realMileage | number}} km</td>
+                                                        </tr>
+                                                        <tr>
+                                                            <th>Prix d'achat</th>
+                                                            <td class="fw-bold">{{formData.purchasePrice | number}} Ar</td>
+                                                        </tr>
+                                                    </table>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <!-- Évaluation de l'état -->
+                                    <div class="card mb-4 shadow-sm">
+                                        <div class="card-header bg-light">
+                                            <h5 class="fw-bold mb-0">État du Véhicule</h5>
+                                        </div>
+                                        <div class="card-body">
+                                            <div class="row g-4">
+                                                <div class="col-md-4 text-center">
+                                                    <div class="bg-info p-1 rounded">
+                                                        <div class="h2 mb-0">{{formData.bodyRating}}/10</div>
+                                                        <small class="text-muted">Carrosserie</small>
+                                                    </div>
+                                                </div>
+                                                <div class="col-md-4 text-center">
+                                                    <div class="bg-info p-1 rounded">
+                                                        <div class="h2 mb-0">{{formData.interiorRating}}/10</div>
+                                                        <small class="text-muted">Intérieur</small>
+                                                    </div>
+                                                </div>
+                                                <div class="col-md-4 text-center">
+                                                    <div class="bg-info p-1 rounded">
+                                                        <div class="h2 mb-0">{{formData.engineRating}}/10</div>
+                                                        <small class="text-muted">Moteur</small>
+                                                    </div>
+                                                </div>
+                                                <div class="col-12">
+                                                    <div class="alert alert-secondary mb-0">
+                                                        Note moyenne : <strong>{{formData.averageRating}}/10</strong> - 
+                                                        Évaluation globale : <span class="badge bg-primary">{{formData.ratingResult}}</span>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    
+                                    
+
+                                    <!-- Dépréciation et Valeur Finale -->
+                                    <div class="card mb-4 shadow-sm">
+                                        <div class="card-header bg-light">
+                                            <h5 class="fw-bold mb-0">Calcul de la Valeur</h5>
+                                        </div>
+                                        <div class="card-body">
+                                            <!-- Dépréciation Standard -->
+                                            <div class="mb-4">
+                                                <h6 class="fw-bold border-bottom pb-2">Dépréciation Annuelle</h6>
+                                                <div class="row">
+                                                    <div class="col-md-6">
+                                                        <table class="table table-bordered">
+                                                            <tr>
+                                                                <th>Type d'usage</th>
+                                                                <td class="text-capitalize">{{formData.usageType}}</td>
+                                                            </tr>
+                                                            <tr>
+                                                                <th>1ʳᵉ année</th>
+                                                                <td class="text-danger">-{{depreciationData.rates.firstYearRate | percentage:0}}</td>
+                                                            </tr>
+                                                            <tr>
+                                                                <th>Années suivantes</th>
+                                                                <td class="text-danger">-{{depreciationData.rates.annualRate | percentage:0}}</td>
+                                                            </tr>
+                                                        </table>
+                                                    </div>
+                                                    <div class="col-md-6">
+                                                        <div class="bg-light p-3 rounded">
+                                                            <div class="font-monospace">
+                                                                {{formData.purchasePrice | number}} × 
+                                                                (1−{{depreciationData.rates.firstYearRate}}) × 
+                                                                (1−{{depreciationData.rates.annualRate}})<sup>{{depreciationData.yearsSincePurchase - 1}}</sup>
+                                                            </div>
+                                                            <div class="h4 mt-2">= {{depreciationData.adjustedValueDetails.baseValue | number}} Ar</div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+
+                                            <!-- Ajustements -->
+                                            <div class="mb-4">
+                                                <h6 class="fw-bold border-bottom pb-2">Ajustements</h6>
+                                                <div class="row">
+                                                    <div class="col-md-6">
+                                                        <table class="table">
+                                                            <tr>
+                                                                <th>État ({{formData.ratingResult}})</th>
+                                                                <td>{{depreciationData.adjustments.condition | percentage:0}}</td>
+                                                            </tr>
+                                                            <tr>
+                                                                <th>Kilométrage ({{depreciationData.kmStatus}})</th>
+                                                                <td>{{depreciationData.adjustments.mileage | percentage:0}}</td>
+                                                            </tr>
+                                                        </table>
+                                                    </div>
+                                                    <div class="col-md-6">
+                                                        <div class="bg-light p-3 rounded">
+                                                            <div class="font-monospace">
+                                                                {{ depreciationData.adjustedValueDetails.baseValue | number:0 }} - 
+                                                                ( {{ depreciationData.adjustedValueDetails.baseValue }} x {{ depreciationData.adjustedValueDetails.conditionPercent/100 }}) - 
+                                                                ({{depreciationData.adjustedValueDetails.baseValue}} x {{ depreciationData.adjustedValueDetails.mileagePercent/100 }})
+                                                            </div>
+                                                            <div class="h4 mt-2">= {{ depreciationData.adjustedValueDetails.adjustedValue | number:0 }} Ar</div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+
+                                            <!-- Projections -->
+                                            <div class="mb-4">
+                                                <h6 class="fw-bold border-bottom pb-2">Projections de Valeur</h6>
+                                                <div class="table-responsive">
+                                                    <table class="table table-striped">
+                                                        <thead>
+                                                            <tr>
+                                                                <th>Année</th>
+                                                                <th>Valeur estimée</th>
+                                                                <th>Évolution</th>
+                                                            </tr>
+                                                        </thead>
+                                                        <tbody>
+                                                            <tr>
+                                                                <td>{{currentYear}}</td>
+                                                                <td>{{depreciationData.currentValue | number}} Ar</td>
+                                                                <td>-</td>
+                                                            </tr>
+                                                            <tr>
+                                                                <td>{{currentYear + 1}}</td>
+                                                                <td>{{depreciationData.nextYearValue | number}} Ar</td>
+                                                                <td class="text-danger">▼ {{depreciationData.rates.annualRate | percentage:0}}</td>
+                                                            </tr>
+                                                            <tr>
+                                                                <td>{{currentYear + 2}}</td>
+                                                                <td>{{depreciationData.yearAfterNextValue | number}} Ar</td>
+                                                                <td class="text-danger">▼ {{depreciationData.rates.annualRate | percentage:0}}</td>
+                                                            </tr>
+                                                        </tbody>
+                                                    </table>
+                                                </div>
+                                            </div>
+
+                                            <!-- Valeur Finale -->
+                                            <div class="bg-light p-4 rounded">
+                                                <h5 class="fw-bold mb-4">Synthèse de la Valorisation</h5>
+                                                <table class="table table-bordered">
+                                                    <thead class="table-primary">
+                                                        <tr>
+                                                            <th>Composant</th>
+                                                            <th>Calcul</th>
+                                                            <th>Montant</th>
+                                                        </tr>
+                                                    </thead>
+                                                    <tbody>
+                                                        <tr>
+                                                            <td>Valeur résiduelle (45%)</td>
+                                                            <td>{{depreciationData.currentValue | number}} × 45%</td>
+                                                            <td>{{depreciationData.residualValue | number}} Ar</td>
+                                                        </tr>
+                                                        <tr>
+                                                            <td>Évaluateur 1 (15%)</td>
+                                                            <td>{{depreciationData.evaluator1 | number}} × 15%</td>
+                                                            <td>{{depreciationData.evaluator1Value | number}} Ar</td>
+                                                        </tr>
+                                                        <tr>
+                                                            <td>Évaluateur 2 (15%)</td>
+                                                            <td>{{depreciationData.evaluator2 | number}} × 15%</td>
+                                                            <td>{{depreciationData.evaluator2Value | number}} Ar</td>
+                                                        </tr>
+                                                        <tr>
+                                                            <td>Estimation propriétaire (5%)</td>
+                                                            <td>{{depreciationData.owner | number}} × 5%</td>
+                                                            <td>{{depreciationData.ownerValue | number}} Ar</td>
+                                                        </tr>                                                        
+                                                        <tr>
+                                                            <td>Marché local (20%)</td>
+                                                            <td>{{depreciationData.marketValue | number}} × 20%</td>
+                                                            <td>{{depreciationData.marketValueContrib | number}} Ar</td>
+                                                        </tr>
+                                                    </tbody>
+                                                    <tfoot class="table-success">
+                                                        <tr>
+                                                            <th colspan="2">Valeur finale estimée (arrondie) </th>
+                                                            <th class="h4">{{depreciationData.finalValue | number}} Ar</th>
+                                                        </tr>
+                                                    </tfoot>
+                                                </table>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                </div>
+                                <div class="d-flex justify-content-between mt-4">
+                                    <button class="btn btn-outline-primary" ng-click="returnToForm()">
+                                        <i class="fas fa-edit me-2"></i>Modifier
+                                    </button>
+                                    <button class="btn btn-success" ng-click="validateAndSubmit()">
+                                        <i class="fas fa-check-circle me-2"></i>Valider l'évaluation
+                                    </button>
+                                    <button class="btn btn-primary" ng-click="exportToPDF()">
+                                        <i class="fas fa-file-pdf me-2"></i>Exporter en PDF
+                                    </button>
+                                </div>
+                            </div>
+                            
+
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.2/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+    <script>
+        // Initialiser jsPDF globalement
+        window.jsPDF = window.jspdf.jsPDF;
+    </script>
+    <script src="assets/js/app.js"></script>
+</body>
+</html>
