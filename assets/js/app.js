@@ -170,7 +170,7 @@ app.controller('FormController', ['$scope', function($scope) {
             condition: $scope.formData.ratingResult === 'Bon' ? -0.03 : 
                     $scope.formData.ratingResult === 'Mauvais' ? 0.05 : 0,
             mileage: Math.max(0, Math.floor(
-                ($scope.formData.realMileage - $scope.formData.averageYearlyMileage) / 10000
+                ($scope.formData.realMileage - $scope.formData.averageMileage) / 10000
             ) * 0.02)
         };
 
@@ -222,9 +222,10 @@ app.controller('FormController', ['$scope', function($scope) {
         );
 
         // Libellés d'affichage
-        $scope.depreciationData.kmStatus = $scope.formData.realMileage > $scope.formData.averageYearlyMileage 
-            ? 'surutilisé' 
-            : 'conforme au standard';
+        $scope.depreciationData.kmStatus = ($scope.formData.realMileage - $scope.formData.averageMileage) > 10000
+        ? 'surutilisé'
+        : 'conforme au standard';
+
 
     };
 
